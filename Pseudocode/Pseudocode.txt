@@ -1,0 +1,42 @@
+Semaphore* mutex = new Semaphore(1);
+Semaphore* read_semaphore = new Semaphore(1);
+Semaphore* write_semaphore = new Semaphore(1);
+int reader = 0;
+
+void reader(){
+    while(true){
+        // Entry Section
+        wait(mutex);
+        wait(read_semaphore);
+        reader = reader + 1;
+        if(reader == 1){
+            wait(write_semaphore);
+        }
+        signal(read_semaphore);
+        signal(mutex);
+
+        // Critical Section
+
+        //Exit Section
+        wait(read_semaphore);
+        reader = reader - 1;
+        if(reader == 0){
+            signal(write_semaphore);
+        }
+        signal(read_semaphore);
+    }
+}
+
+void writer(){
+    while(true){
+        // Entry Section
+        wait(mutex);
+        wait(write_semaphore);
+
+        // Critical Section
+
+        //Exit Section
+        signal(write_semaphore);
+        signal(mutex);
+    }
+}
